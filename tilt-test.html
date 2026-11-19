@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Tilt Labyrinth: tilt test</title>
+<style>
+  :root {
+    --ink: #1f2023;
+    --ink-2: #5b5e66;
+    --paper: #ecebe8;
+    --line: #c9c7c2;
+    --warm: #e2a33b;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%; overflow: hidden;
+    background: #d9d8d4; color: var(--ink);
+    font: 15px/1.4 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    -webkit-user-select: none; user-select: none;
+    -webkit-touch-callout: none; touch-action: none;
+  }
+  canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+  .hud {
+    position: fixed; left: 0; right: 0; top: 0;
+    display: flex; align-items: flex-start; justify-content: space-between;
+    padding: calc(env(safe-area-inset-top) + 12px) 14px 0 14px;
+    pointer-events: none;
+  }
+  .label {
+    font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2);
+    padding-top: 9px;
+  }
+  .buttons { display: flex; gap: 8px; pointer-events: auto; }
+  button {
+    font: inherit; font-size: 14px; color: var(--ink);
+    background: var(--paper); border: 1px solid var(--line); border-radius: 8px;
+    padding: 7px 12px; cursor: pointer;
+  }
+  button:active { background: #dfddd8; }
+  button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .hint {
+    position: fixed; left: 14px; bottom: calc(env(safe-area-inset-bottom) + 14px);
+    font-size: 13px; color: var(--ink-2); pointer-events: none; max-width: 70vw;
+  }
+  .panel {
+    position: fixed; left: 14px; right: 14px; bottom: calc(env(safe-area-inset-bottom) + 14px);
+    max-width: 380px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px; box-shadow: 0 6px 24px rgba(0,0,0,.08);
+  }
+  .panel h1 { font-size: 18px; margin: 0 0 6px; font-weight: 600; }
+  .panel p { margin: 0 0 12px; color: var(--ink-2); font-size: 14px; }
+  .panel .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .hidden { display: none !important; }
+  .tune label { display: block; font-size: 13px; color: var(--ink-2); margin: 10px 0 2px; }
+  .tune label span { float: right; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .tune input[type=range] { width: 100%; }
+  .tune .check { display: flex; align-items: center; gap: 8px; margin-top: 12px; color: var(--ink); }
+  .tune .row { margin-top: 14px; }
+  .toast {
+    position: fixed; left: 14px; top: calc(env(safe-area-inset-top) + 56px);
+    background: var(--ink); color: var(--paper); font-size: 13px;
+    padding: 8px 12px; border-radius: 8px; max-width: 80vw; pointer-events: none;
+    transition: opacity .3s; opacity: 0;
+  }
+  .toast.show { opacity: 1; }
+  .stick {
+    position: fixed; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%;
+    border: 1.5px solid rgba(31,32,35,.25); pointer-events: none;
+  }
+  .stick i {
+    position: absolute; left: 50%; top: 50%; width: 36px; height: 36px; margin: -18px 0 0 -18px;
+    border-radius: 50%; background: rgba(31,32,35,.35);
+  }
+</style>
+</head>
+<body>
+<canvas id="c" aria-label="Tilt test board. Drag anywhere, or use the arrow keys, to tilt the board."></canvas>
+
+<div class="hud">
+  <div class="label">Tilt test 01</div>
+  <div class="buttons">
+    <button id="btnRecal" class="hidden">Reset flat</button>
+    <button id="btnTune">Tune</button>
+  </div>
+</div>
+
+<div id="hint" class="hint hidden">Drag anywhere to tilt the board. Arrow keys work too.</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="stick" class="stick hidden"><i></i></div>
+
+<div id="start" class="panel">
+  <h1>Tilt test</h1>
+  <p>Roll the ball to the cup at the top. Holes send you back to the start, or to the yellow pad once you've lit it.</p>
+  <div class="row">
+    <button id="btnTilt" class="primary">Use tilt</button>
+    <button id="btnDrag">Use drag</button>
+  </div>
+</div>
+
+<div id="win" class="panel hidden">
+  <h1>In the cup.</h1>
+  <p id="winText">Again, or open Tune and change how it feels.</p>
+  <div class="row"><button id="btnAgain" class="primary">Again</button></div>
+</div>
+
+<div id="tune" class="panel tune hidden">
+  <h1>Tune the feel</h1>
+  <label>Sensitivity <span id="vSens"></span></label>
+  <input id="sens" type="range" min="0.3" max="1.6" step="0.05" value="0.8">
+  <label>Steepest tilt <span id="vMax"></span></label>
+  <input id="maxTilt" type="range" min="4" max="16" step="1" value="9">
+  <label>Ball weight (rolling friction) <span id="vFric"></span></label>
+  <input id="fric" type="range" min="0.05" max="1.5" step="0.05" value="0.35">
+  <label>Bounce off walls <span id="vBounce"></span></label>
+  <input id="bounce" type="range" min="0" max="0.7" step="0.05" value="0.3">
+  <label class="check"><input id="still" type="checkbox"> Keep the board still on screen</label>
+  <label class="check"><input id="sound" type="checkbox" checked> Sound</label>
+  <div class="row"><button id="btnTuneClose" class="primary">Done</button><button id="btnTuneReset">Reset to default</button></div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+// ---------- Level (board units; x right, y away from the player) ----------
+const BW = 9, BH = 14, HALF_W = BW / 2, HALF_H = BH / 2, WALL_T = 0.3, WALL_H = 0.5;
+const BALL_R = 0.35;
+const START = { x: -3.2, y: -5.6 };
+const walls = [
+  // perimeter
+  { x0: -HALF_W - WALL_T, y0: -HALF_H - WALL_T, x1: HALF_W + WALL_T, y1: -HALF_H },
+  { x0: -HALF_W - WALL_T, y0: HALF_H, x1: HALF_W + WALL_T, y1: HALF_H + WALL_T },
+  { x0: -HALF_W - WALL_T, y0: -HALF_H, x1: -HALF_W, y1: HALF_H },
+  { x0: HALF_W, y0: -HALF_H, x1: HALF_W + WALL_T, y1: HALF_H },
+  // inner
+  { x0: -HALF_W, y0: -3 - WALL_T / 2, x1: 1.5, y1: -3 + WALL_T / 2 },
+  { x0: -1.5, y0: 1 - WALL_T / 2, x1: HALF_W, y1: 1 + WALL_T / 2 },
+  { x0: -HALF_W, y0: 4.5 - WALL_T / 2, x1: 1.5, y1: 4.5 + WALL_T / 2 },
+];
+const holes = [
+  { x: -0.4, y: -5.1, r: 0.5 },
+  { x: 0.2, y: -1.0, r: 0.5 },
+  { x: 2.4, y: 2.75, r: 0.5 },
+  { x: 0.2, y: 5.85, r: 0.5 },
+];
+const pad = { x: -3.1, y: 2.3, s: 0.9 };
+const goal = { x: -3.3, y: 5.8, r: 0.48 };
+
+// ---------- Settings ----------
+const DEFAULTS = { sens: 0.8, maxTilt: 9, fric: 0.35, bounce: 0.3 };
+const set = { ...DEFAULTS, still: false, sound: true };
+const G = 42; // board units per second squared
+
+// ---------- Renderer ----------
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.setClearColor(0xd9d8d4);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 200);
+const CAM_TIP = THREE.MathUtils.degToRad(15);
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0xb8b4ac, 1.4));
+const sun = new THREE.DirectionalLight(0xfff4e2, 2.2);
+sun.position.set(-6, 18, 8);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024);
+Object.assign(sun.shadow.camera, { left: -9, right: 9, top: 10, bottom: -10, near: 1, far: 50 });
+sun.shadow.radius = 4;
+scene.add(sun);
+
+const board = new THREE.Group();
+scene.add(board);
+
+const toWorld = (x, y, h = 0) => new THREE.Vector3(x, h, -y);
+
+// base
+const baseMat = new THREE.MeshStandardMaterial({ color: 0xbdbab3, roughness: 0.9 });
+const base = new THREE.Mesh(new THREE.BoxGeometry(BW + 2 * WALL_T, 0.4, BH + 2 * WALL_T), baseMat);
+base.position.y = -0.2; base.receiveShadow = true;
+board.add(base);
+
+// walls
+const wallMat = new THREE.MeshStandardMaterial({ color: 0x8f8c86, roughness: 0.8 });
+for (const w of walls) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w.x1 - w.x0, WALL_H, w.y1 - w.y0), wallMat);
+  m.position.copy(toWorld((w.x0 + w.x1) / 2, (w.y0 + w.y1) / 2, WALL_H / 2));
+  m.castShadow = true; m.receiveShadow = true;
+  board.add(m);
+}
+
+// holes
+const holeMat = new THREE.MeshBasicMaterial({ color: 0x1a1a1c });
+const rimMat = new THREE.MeshStandardMaterial({ color: 0x77746e, roughness: 0.7 });
+for (const h of holes) {
+  const d = new THREE.Mesh(new THREE.CircleGeometry(h.r, 40), holeMat);
+  d.rotation.x = -Math.PI / 2; d.position.copy(toWorld(h.x, h.y, 0.002));
+  board.add(d);
+  const rim = new THREE.Mesh(new THREE.RingGeometry(h.r, h.r + 0.07, 40), rimMat);
+  rim.rotation.x = -Math.PI / 2; rim.position.copy(toWorld(h.x, h.y, 0.003));
+  board.add(rim);
+}
+
+// checkpoint pad
+const padMat = new THREE.MeshStandardMaterial({ color: 0xa9a59d, roughness: 0.6, emissive: 0x000000 });
+const padMesh = new THREE.Mesh(new THREE.BoxGeometry(pad.s, 0.03, pad.s), padMat);
+padMesh.position.copy(toWorld(pad.x, pad.y, 0.015)); padMesh.receiveShadow = true;
+board.add(padMesh);
+
+// goal cup
+const goalMat = new THREE.MeshStandardMaterial({ color: 0x8a857c, emissive: 0x000000 });
+const goalDisc = new THREE.Mesh(new THREE.CircleGeometry(goal.r, 40), goalMat);
+goalDisc.rotation.x = -Math.PI / 2; goalDisc.position.copy(toWorld(goal.x, goal.y, 0.002));
+board.add(goalDisc);
+const goalRing = new THREE.Mesh(new THREE.TorusGeometry(goal.r + 0.06, 0.1, 12, 48), new THREE.MeshStandardMaterial({ color: 0xf4f2ee, roughness: 0.4 }));
+goalRing.rotation.x = -Math.PI / 2; goalRing.position.copy(toWorld(goal.x, goal.y, 0.03));
+board.add(goalRing);
+
+// ball, with a pattern so you can see it roll
+function ballTexture() {
+  const c = document.createElement('canvas'); c.width = 256; c.height = 128;
+  const g = c.getContext('2d');
+  g.fillStyle = '#e9e7e2'; g.fillRect(0, 0, 256, 128);
+  g.fillStyle = '#3a3b3f'; g.fillRect(0, 56, 256, 16);
+  g.fillStyle = '#c8562f';
+  for (let i = 0; i < 6; i++) { g.beginPath(); g.arc(20 + i * 43, 26 + (i % 2) * 76, 9, 0, Math.PI * 2); g.fill(); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const ball = new THREE.Mesh(
+  new THREE.SphereGeometry(BALL_R, 40, 24),
+  new THREE.MeshStandardMaterial({ map: ballTexture(), roughness: 0.35, metalness: 0.1 })
+);
+ball.castShadow = true;
+board.add(ball);
+
+// ---------- State ----------
+const s = {
+  x: START.x, y: START.y, vx: 0, vy: 0,
+  mode: 'idle',      // idle | play | fall | win
+  t: 0, checkpoint: { ...START }, padLit: false,
+  tiltX: 0, tiltY: 0, // board angles in radians (positive tiltX rolls ball +x)
+  targetX: 0, targetY: 0,
+  control: 'drag', falls: 0, fallT: 0, h: BALL_R, scale: 1,
+};
+
+// ---------- Input: drag ----------
+const stick = document.getElementById('stick');
+const knob = stick.querySelector('i');
+let drag = null;
+const DRAG_R = 60;
+canvas.addEventListener('pointerdown', e => {
+  if (s.mode !== 'play') return;
+  canvas.setPointerCapture(e.pointerId);
+  drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, dx: 0, dy: 0 };
+  stick.style.left = e.clientX + 'px'; stick.style.top = e.clientY + 'px';
+  knob.style.transform = 'translate(0,0)';
+  stick.classList.remove('hidden');
+  audio.unlock();
+});
+canvas.addEventListener('pointermove', e => {
+  if (!drag || e.pointerId !== drag.id) return;
+  let dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+  const len = Math.hypot(dx, dy);
+  if (len > DRAG_R) { dx *= DRAG_R / len; dy *= DRAG_R / len; }
+  drag.dx = dx; drag.dy = dy;
+  knob.style.transform = `translate(${dx}px,${dy}px)`;
+});
+const endDrag = e => { if (drag && e.pointerId === drag.id) { drag = null; stick.classList.add('hidden'); } };
+canvas.addEventListener('pointerup', endDrag);
+canvas.addEventListener('pointercancel', endDrag);
+
+// keyboard
+const keys = new Set();
+addEventListener('keydown', e => { if (e.key.startsWith('Arrow')) { keys.add(e.key); e.preventDefault(); } });
+addEventListener('keyup', e => keys.delete(e.key));
+
+// ---------- Input: tilt ----------
+let tiltRef = null, tiltLast = null, tiltSeen = false;
+function onOrient(e) {
+  if (e.beta == null || e.gamma == null) return;
+  tiltSeen = true;
+  tiltLast = { b: e.beta, g: e.gamma };
+  if (!tiltRef) tiltRef = { ...tiltLast };
+}
+async function enableTilt() {
+  try {
+    if (typeof DeviceOrientationEvent === 'undefined') throw new Error('none');
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      const r = await DeviceOrientationEvent.requestPermission();
+      if (r !== 'granted') throw new Error('denied');
+    }
+    addEventListener('deviceorientation', onOrient);
+    await new Promise(r => setTimeout(r, 1200));
+    if (!tiltSeen) throw new Error('silent');
+    return true;
+  } catch (err) {
+    removeEventListener('deviceorientation', onOrient);
+    return false;
+  }
+}
+
+// ---------- Audio ----------
+const audio = {
+  ctx: null, roll: null, rollGain: null,
+  unlock() {
+    if (this.ctx) { if (this.ctx.state === 'suspended') this.ctx.resume(); return; }
+    try {
+      const C = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new C();
+      // rolling: looped brown-ish noise through a low-pass
+      const len = this.ctx.sampleRate * 2, buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate), d = buf.getChannelData(0);
+      let last = 0; for (let i = 0; i < len; i++) { last = (last + 0.02 * (Math.random() * 2 - 1)) / 1.02; d[i] = last * 3.5; }
+      const src = this.ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+      const lp = this.ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 500;
+      this.rollGain = this.ctx.createGain(); this.rollGain.gain.value = 0;
+      src.connect(lp).connect(this.rollGain).connect(this.ctx.destination); src.start();
+      this.lp = lp;
+    } catch (e) { this.ctx = null; }
+  },
+  rolling(speed) {
+    if (!this.ctx) return;
+    const v = set.sound && s.mode === 'play' ? Math.min(speed / 9, 1) * 0.5 : 0;
+    this.rollGain.gain.setTargetAtTime(v, this.ctx.currentTime, 0.05);
+    this.lp.frequency.setTargetAtTime(250 + speed * 60, this.ctx.currentTime, 0.05);
+  },
+  tone(freq, dur, type = 'sine', vol = 0.25, slideTo) {
+    if (!this.ctx || !set.sound) return;
+    const t = this.ctx.currentTime, o = this.ctx.createOscillator(), g = this.ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(this.ctx.destination); o.start(t); o.stop(t + dur + 0.02);
+  },
+  tick(strength) {
+    if (!this.ctx || !set.sound) return;
+    const t = this.ctx.currentTime, n = this.ctx.createBufferSource();
+    const b = this.ctx.createBuffer(1, 1200, this.ctx.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 6);
+    n.buffer = b;
+    const bp = this.ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1800; bp.Q.value = 1.2;
+    const g = this.ctx.createGain(); g.gain.value = Math.min(strength / 6, 1) * 0.9;
+    n.connect(bp).connect(g).connect(this.ctx.destination); n.start(t);
+  },
+};
+
+// ---------- Physics ----------
+let lastHit = 0;
+function collideWalls() {
+  for (const w of walls) {
+    const cx = Math.max(w.x0, Math.min(s.x, w.x1));
+    const cy = Math.max(w.y0, Math.min(s.y, w.y1));
+    let dx = s.x - cx, dy = s.y - cy;
+    let d = Math.hypot(dx, dy);
+    if (d >= BALL_R) continue;
+    let nx, ny;
+    if (d < 1e-6) {
+      // centre inside the wall: push out along the shortest axis
+      const pen = [[s.x - w.x0, -1, 0], [w.x1 - s.x, 1, 0], [s.y - w.y0, 0, -1], [w.y1 - s.y, 0, 1]].sort((a, b) => a[0] - b[0])[0];
+      nx = pen[1]; ny = pen[2]; d = -pen[0];
+    } else { nx = dx / d; ny = dy / d; }
+    const push = BALL_R - d;
+    s.x += nx * push; s.y += ny * push;
+    const vn = s.vx * nx + s.vy * ny;
+    if (vn < 0) {
+      s.vx -= (1 + set.bounce) * vn * nx; s.vy -= (1 + set.bounce) * vn * ny;
+      const now = performance.now();
+      if (-vn > 0.8 && now - lastHit > 40) { audio.tick(-vn); lastHit = now; }
+    }
+  }
+}
+
+function step(dt) {
+  const ax = G * Math.sin(s.tiltX) * 5 / 7;
+  const ay = G * Math.sin(s.tiltY) * 5 / 7;
+  s.vx += ax * dt; s.vy += ay * dt;
+
+  // hole lip: a gentle pull once the ball overhangs the edge
+  for (const h of holes) {
+    const dx = h.x - s.x, dy = h.y - s.y, d = Math.hypot(dx, dy);
+    if (d < h.r + BALL_R * 0.35 && d > 1e-4) {
+      const pull = 14 * (1 - d / (h.r + BALL_R * 0.35));
+      s.vx += dx / d * pull * dt; s.vy += dy / d * pull * dt;
+    }
+  }
+
+  const damp = Math.max(0, 1 - set.fric * dt);
+  s.vx *= damp; s.vy *= damp;
+  const sp = Math.hypot(s.vx, s.vy), MAX = 18;
+  if (sp > MAX) { s.vx *= MAX / sp; s.vy *= MAX / sp; }
+
+  s.x += s.vx * dt; s.y += s.vy * dt;
+  collideWalls();
+
+  // events
+  for (const h of holes) {
+    if (Math.hypot(h.x - s.x, h.y - s.y) < h.r - 0.08) { startFall(h); return; }
+  }
+  if (!s.padLit && Math.abs(s.x - pad.x) < pad.s / 2 && Math.abs(s.y - pad.y) < pad.s / 2) {
+    s.padLit = true; s.checkpoint = { x: pad.x, y: pad.y };
+    padMat.color.set(0xf0c25a); padMat.emissive.set(0x6b4300);
+    audio.tone(660, 0.25, 'sine', 0.2); setTimeout(() => audio.tone(990, 0.35, 'sine', 0.18), 110);
+    toast('Pad lit. Holes now bring you back here.');
+  }
+  if (Math.hypot(goal.x - s.x, goal.y - s.y) < goal.r - 0.12) win();
+}
+
+let fallHole = null;
+function startFall(h) {
+  s.mode = 'fall'; s.fallT = 0; fallHole = h; s.falls++;
+  audio.tone(140, 0.45, 'sine', 0.45, 55);
+}
+function respawn() {
+  s.x = s.checkpoint.x; s.y = s.checkpoint.y; s.vx = 0; s.vy = 0; s.h = BALL_R; s.scale = 1;
+  ball.quaternion.identity();
+  s.mode = 'play';
+}
+function win() {
+  s.mode = 'win';
+  goalMat.emissive.set(0xa36a10); goalMat.color.set(0xf0c25a);
+  [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => audio.tone(f, 0.5, 'sine', 0.16), i * 120));
+  document.getElementById('winText').textContent =
+    s.falls === 0 ? 'No falls. Again, or open Tune and change how it feels.' :
+    `Again, or open Tune and change how it feels.`;
+  setTimeout(() => document.getElementById('win').classList.remove('hidden'), 700);
+}
+function reset() {
+  s.checkpoint = { ...START }; s.padLit = false; s.falls = 0;
+  padMat.color.set(0xa9a59d); padMat.emissive.set(0x000000);
+  goalMat.emissive.set(0x000000); goalMat.color.set(0x8a857c);
+  respawn();
+}
+
+// ---------- Tilt targets ----------
+function recalibrate(show = true) {
+  if (tiltLast) tiltRef = { ...tiltLast };
+  if (show) toast('This angle is now flat.');
+}
+function updateTargets() {
+  const max = THREE.MathUtils.degToRad(set.maxTilt);
+  let tx = 0, ty = 0;
+  if (s.control === 'tilt' && tiltLast && tiltRef) {
+    // gamma: right edge down is positive. beta: top edge tipping away from you is lower.
+    tx = THREE.MathUtils.degToRad((tiltLast.g - tiltRef.g) * set.sens);
+    ty = THREE.MathUtils.degToRad((tiltRef.b - tiltLast.b) * set.sens);
+  }
+  if (drag) {
+    tx = (drag.dx / DRAG_R) * max * Math.min(1, set.sens / 0.8);
+    ty = (-drag.dy / DRAG_R) * max * Math.min(1, set.sens / 0.8);
+  }
+  if (keys.size) {
+    if (keys.has('ArrowLeft')) tx = -max * 0.7;
+    if (keys.has('ArrowRight')) tx = max * 0.7;
+    if (keys.has('ArrowUp')) ty = max * 0.7;
+    if (keys.has('ArrowDown')) ty = -max * 0.7;
+  }
+  s.targetX = Math.max(-max, Math.min(max, tx));
+  s.targetY = Math.max(-max, Math.min(max, ty));
+}
+
+// ---------- Camera fit ----------
+function resize() {
+  const w = innerWidth, h = innerHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  const vfov = THREE.MathUtils.degToRad(camera.fov);
+  const needH = (BH + 1.6) / 2, needW = (BW + 1.4) / 2;
+  const hfov = 2 * Math.atan(Math.tan(vfov / 2) * camera.aspect);
+  const d = Math.max(needH / Math.tan(vfov / 2), needW / Math.tan(hfov / 2)) * 1.06;
+  camera.position.set(0, d * Math.cos(CAM_TIP), d * Math.sin(CAM_TIP));
+  camera.lookAt(0, 0, -0.3);
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize);
+resize();
+
+// ---------- Loop ----------
+const q = new THREE.Quaternion(), axis = new THREE.Vector3();
+let prev = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - prev) / 1000); prev = now;
+  if (s.mode === 'play' || s.mode === 'fall') updateTargets(); else { s.targetX = 0; s.targetY = 0; }
+  const ease = 1 - Math.exp(-dt * (drag || keys.size ? 14 : s.control === 'tilt' ? 20 : 8));
+  s.tiltX += (s.targetX - s.tiltX) * ease;
+  s.tiltY += (s.targetY - s.tiltY) * ease;
+
+  if (s.mode === 'play') {
+    const sub = 4;
+    for (let i = 0; i < sub && s.mode === 'play'; i++) step(dt / sub);
+    const sp = Math.hypot(s.vx, s.vy);
+    if (sp > 1e-4) {
+      axis.set(-s.vy, 0, -s.vx).normalize();
+      q.setFromAxisAngle(axis, sp * dt / BALL_R);
+      ball.quaternion.premultiply(q);
+    }
+    audio.rolling(sp);
+  } else {
+    audio.rolling(0);
+  }
+
+  if (s.mode === 'fall') {
+    s.fallT += dt;
+    const k = Math.min(1, s.fallT / 0.35);
+    s.x += (fallHole.x - s.x) * Math.min(1, dt * 12);
+    s.y += (fallHole.y - s.y) * Math.min(1, dt * 12);
+    s.h = BALL_R - k * BALL_R * 2.4;
+    if (s.fallT > 0.75) respawn();
+  }
+  if (s.mode === 'win') {
+    s.x += (goal.x - s.x) * Math.min(1, dt * 8); s.y += (goal.y - s.y) * Math.min(1, dt * 8);
+    s.h += (BALL_R * 0.25 - s.h) * Math.min(1, dt * 6);
+  }
+
+  ball.position.copy(toWorld(s.x, s.y, s.h));
+  if (set.still) { board.rotation.set(0, 0, 0); }
+  else { board.rotation.set(-s.tiltY, 0, -s.tiltX); }
+
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+// ---------- UI ----------
+const $ = id => document.getElementById(id);
+let toastTimer;
+function toast(msg, ms = 2600) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), ms);
+}
+function begin(control) {
+  s.control = control;
+  $('start').classList.add('hidden');
+  $('hint').classList.toggle('hidden', false);
+  $('hint').textContent = control === 'tilt'
+    ? 'Tilt the phone. You can still drag with a thumb.'
+    : 'Drag anywhere to tilt the board. Arrow keys work too.';
+  $('btnRecal').classList.toggle('hidden', control !== 'tilt');
+  reset();
+}
+$('btnTilt').onclick = async () => {
+  audio.unlock();
+  $('btnTilt').textContent = 'Checking…';
+  const ok = await enableTilt();
+  $('btnTilt').textContent = 'Use tilt';
+  if (ok) { recalibrate(false); begin('tilt'); toast('Hold the phone how you like. That angle is flat.'); }
+  else { begin('drag'); toast('Tilt isn’t available in this window, so drag is on.', 4200); }
+};
+$('btnDrag').onclick = () => { audio.unlock(); begin('drag'); };
+$('btnAgain').onclick = () => { $('win').classList.add('hidden'); reset(); };
+$('btnRecal').onclick = () => recalibrate(true);
+
+const sliders = [['sens', 'vSens', v => v.toFixed(2)], ['maxTilt', 'vMax', v => v + '°'], ['fric', 'vFric', v => v.toFixed(2)], ['bounce', 'vBounce', v => v.toFixed(2)]];
+function syncSliders() {
+  for (const [id, out, fmt] of sliders) { $(id).value = set[id]; $(out).textContent = fmt(+set[id]); }
+  $('still').checked = set.still; $('sound').checked = set.sound;
+}
+for (const [id, out, fmt] of sliders) $(id).addEventListener('input', e => { set[id] = +e.target.value; $(out).textContent = fmt(set[id]); });
+$('still').onchange = e => set.still = e.target.checked;
+$('sound').onchange = e => set.sound = e.target.checked;
+let pausedMode = null;
+$('btnTune').onclick = () => {
+  const open = $('tune').classList.contains('hidden');
+  $('tune').classList.toggle('hidden', !open);
+  if (open && s.mode === 'play') { pausedMode = 'play'; s.mode = 'idle'; }
+  else if (!open && pausedMode) { s.mode = pausedMode; pausedMode = null; }
+};
+$('btnTuneClose').onclick = () => { $('tune').classList.add('hidden'); if (pausedMode) { s.mode = pausedMode; pausedMode = null; } };
+$('btnTuneReset').onclick = () => { Object.assign(set, DEFAULTS); syncSliders(); };
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) set.still = true;
+syncSliders();
+
+// test hook for QA
+window.__tilt = { s, set, holes, walls, goal, pad };
+</script>
+</body>
+</html>

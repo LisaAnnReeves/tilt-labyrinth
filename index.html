@@ -3,51 +3,28 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Tilt Labyrinth: tilt test</title>
+<title>Tilt Labyrinth: level one grey box</title>
 <style>
-  :root {
-    --ink: #1f2023;
-    --ink-2: #5b5e66;
-    --paper: #ecebe8;
-    --line: #c9c7c2;
-    --warm: #e2a33b;
-  }
+  :root { --ink: #1f2023; --ink-2: #5b5e66; --paper: #ecebe8; --line: #c9c7c2; }
   * { box-sizing: border-box; }
   html, body {
-    margin: 0; height: 100%; overflow: hidden;
-    background: #d9d8d4; color: var(--ink);
+    margin: 0; height: 100%; overflow: hidden; background: #d9d8d4; color: var(--ink);
     font: 15px/1.4 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-    -webkit-user-select: none; user-select: none;
-    -webkit-touch-callout: none; touch-action: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: none;
   }
   canvas { display: block; width: 100%; height: 100%; touch-action: none; }
-  .hud {
-    position: fixed; left: 0; right: 0; top: 0;
-    display: flex; align-items: flex-start; justify-content: space-between;
-    padding: calc(env(safe-area-inset-top) + 12px) 14px 0 14px;
-    pointer-events: none;
-  }
-  .label {
-    font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2);
-    padding-top: 9px;
-  }
+  .hud { position: fixed; left: 0; right: 0; top: 0; display: flex; align-items: flex-start; justify-content: space-between;
+    padding: calc(env(safe-area-inset-top) + 12px) 14px 0 14px; pointer-events: none; }
+  .label { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-2); padding-top: 9px; }
   .buttons { display: flex; gap: 8px; pointer-events: auto; }
-  button {
-    font: inherit; font-size: 14px; color: var(--ink);
-    background: var(--paper); border: 1px solid var(--line); border-radius: 8px;
-    padding: 7px 12px; cursor: pointer;
-  }
+  button { font: inherit; font-size: 14px; color: var(--ink); background: var(--paper); border: 1px solid var(--line);
+    border-radius: 8px; padding: 7px 12px; cursor: pointer; }
   button:active { background: #dfddd8; }
   button.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
-  .hint {
-    position: fixed; left: 14px; bottom: calc(env(safe-area-inset-bottom) + 14px);
-    font-size: 13px; color: var(--ink-2); pointer-events: none; max-width: 70vw;
-  }
-  .panel {
-    position: fixed; left: 14px; right: 14px; bottom: calc(env(safe-area-inset-bottom) + 14px);
-    max-width: 380px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px;
-    padding: 16px; box-shadow: 0 6px 24px rgba(0,0,0,.08);
-  }
+  .hint { position: fixed; left: 14px; bottom: calc(env(safe-area-inset-bottom) + 14px); font-size: 13px; color: var(--ink-2);
+    pointer-events: none; max-width: 70vw; }
+  .panel { position: fixed; left: 14px; right: 14px; bottom: calc(env(safe-area-inset-bottom) + 14px); max-width: 380px;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 16px; box-shadow: 0 6px 24px rgba(0,0,0,.08); }
   .panel h1 { font-size: 18px; margin: 0 0 6px; font-weight: 600; }
   .panel p { margin: 0 0 12px; color: var(--ink-2); font-size: 14px; }
   .panel .row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -57,41 +34,34 @@
   .tune input[type=range] { width: 100%; }
   .tune .check { display: flex; align-items: center; gap: 8px; margin-top: 12px; color: var(--ink); }
   .tune .row { margin-top: 14px; }
-  .toast {
-    position: fixed; left: 14px; top: calc(env(safe-area-inset-top) + 56px);
-    background: var(--ink); color: var(--paper); font-size: 13px;
-    padding: 8px 12px; border-radius: 8px; max-width: 80vw; pointer-events: none;
-    transition: opacity .3s; opacity: 0;
-  }
+  .toast { position: fixed; left: 14px; top: calc(env(safe-area-inset-top) + 56px); background: var(--ink); color: var(--paper);
+    font-size: 13px; padding: 8px 12px; border-radius: 8px; max-width: 80vw; pointer-events: none; transition: opacity .3s; opacity: 0; }
   .toast.show { opacity: 1; }
-  .stick {
-    position: fixed; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%;
-    border: 1.5px solid rgba(31,32,35,.25); pointer-events: none;
-  }
-  .stick i {
-    position: absolute; left: 50%; top: 50%; width: 36px; height: 36px; margin: -18px 0 0 -18px;
-    border-radius: 50%; background: rgba(31,32,35,.35);
-  }
+  .stick { position: fixed; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%;
+    border: 1.5px solid rgba(31,32,35,.25); pointer-events: none; }
+  .stick i { position: absolute; left: 50%; top: 50%; width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 50%;
+    background: rgba(31,32,35,.35); }
 </style>
 </head>
 <body>
-<canvas id="c" aria-label="Tilt test board. Drag anywhere, or use the arrow keys, to tilt the board."></canvas>
+<canvas id="c" aria-label="Level one board. Drag anywhere, or use the arrow keys, to tilt the board."></canvas>
 
 <div class="hud">
-  <div class="label">Tilt test 01</div>
+  <div class="label">Level 01 &middot; grey box</div>
   <div class="buttons">
     <button id="btnRecal" class="hidden">Reset flat</button>
+    <button id="btnRestart" class="hidden">Restart</button>
     <button id="btnTune">Tune</button>
   </div>
 </div>
 
-<div id="hint" class="hint hidden">Drag anywhere to tilt the board. Arrow keys work too.</div>
+<div id="hint" class="hint hidden"></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <div id="stick" class="stick hidden"><i></i></div>
 
 <div id="start" class="panel">
-  <h1>Tilt test</h1>
-  <p>Roll the ball to the cup at the top. Holes send you back to the start, or to the yellow pad once you've lit it.</p>
+  <h1>Level one</h1>
+  <p>Roll the ball into the sun in the top corner.</p>
   <div class="row">
     <button id="btnTilt" class="primary">Use tilt</button>
     <button id="btnDrag">Use drag</button>
@@ -99,9 +69,9 @@
 </div>
 
 <div id="win" class="panel hidden">
-  <h1>In the cup.</h1>
-  <p id="winText">Again, or open Tune and change how it feels.</p>
-  <div class="row"><button id="btnAgain" class="primary">Again</button></div>
+  <h1>Home to the sun.</h1>
+  <p id="winText"></p>
+  <div class="row"><button id="btnAgain" class="primary">Play again</button></div>
 </div>
 
 <div id="tune" class="panel tune hidden">
@@ -114,6 +84,8 @@
   <input id="fric" type="range" min="0.05" max="1.5" step="0.05" value="0.35">
   <label>Bounce off walls <span id="vBounce"></span></label>
   <input id="bounce" type="range" min="0" max="0.7" step="0.05" value="0.3">
+  <label>Turning arm speed <span id="vArm"></span></label>
+  <input id="arm" type="range" min="0" max="2" step="0.1" value="1">
   <label class="check"><input id="still" type="checkbox"> Keep the board still on screen</label>
   <label class="check"><input id="sound" type="checkbox" checked> Sound</label>
   <div class="row"><button id="btnTuneClose" class="primary">Done</button><button id="btnTuneReset">Reset to default</button></div>
@@ -125,36 +97,73 @@
 <script type="module">
 import * as THREE from 'three';
 
-// ---------- Level (board units; x right, y away from the player) ----------
-const BW = 9, BH = 14, HALF_W = BW / 2, HALF_H = BH / 2, WALL_T = 0.3, WALL_H = 0.5;
-const BALL_R = 0.35;
-const START = { x: -3.2, y: -5.6 };
-const walls = [
-  // perimeter
-  { x0: -HALF_W - WALL_T, y0: -HALF_H - WALL_T, x1: HALF_W + WALL_T, y1: -HALF_H },
-  { x0: -HALF_W - WALL_T, y0: HALF_H, x1: HALF_W + WALL_T, y1: HALF_H + WALL_T },
-  { x0: -HALF_W - WALL_T, y0: -HALF_H, x1: -HALF_W, y1: HALF_H },
-  { x0: HALF_W, y0: -HALF_H, x1: HALF_W + WALL_T, y1: HALF_H },
-  // inner
-  { x0: -HALF_W, y0: -3 - WALL_T / 2, x1: 1.5, y1: -3 + WALL_T / 2 },
-  { x0: -1.5, y0: 1 - WALL_T / 2, x1: HALF_W, y1: 1 + WALL_T / 2 },
-  { x0: -HALF_W, y0: 4.5 - WALL_T / 2, x1: 1.5, y1: 4.5 + WALL_T / 2 },
-];
+/* =====================================================================
+   LEVEL ONE (board units; x right, y away from the player)
+   Board 9 x 14. Four rows, bottom to top:
+   A  start, first hole, one-way gate up into B
+   B  switch 1 (teal) opens door 1 into C
+   C  turning arm, holes either side, exit top-left into D
+   D  drawbridge over a pit. Switch A (green) lowers the bridge.
+      Switch B (amber) opens the sun door AND raises the bridge.
+      So: amber first, then green, then cross.
+   ===================================================================== */
+const BW = 9, BH = 14, HW = BW / 2, HH = BH / 2, WT = 0.3, WH = 0.5, BALL_R = 0.35;
+const START = { x: -3.5, y: -6.1 };
+
+const COL = { teal: 0x2f8f8a, green: 0x5b9a3c, amber: 0xd38b26 };
+
+// fixed walls: [x0, y0, x1, y1]
+const fixedWalls = [
+  [-HW - WT, -HH - WT, HW + WT, -HH], [-HW - WT, HH, HW + WT, HH + WT],
+  [-HW - WT, -HH, -HW, HH], [HW, -HH, HW + WT, HH],
+  [-HW, -4.15, 2.5, -3.85],          // A/B wall, gate gap at right
+  [-HW, -1.15, 2.0, -0.85],          // B/C wall, door 1 at right
+  [-2.0, 2.35, HW, 2.65],            // C/D wall, opening at left
+  [-HW, 3.9, -2.6, 4.2],             // small baffle by the entry to D
+].map(([x0, y0, x1, y1]) => ({ x0, y0, x1, y1 }));
+
 const holes = [
-  { x: -0.4, y: -5.1, r: 0.5 },
-  { x: 0.2, y: -1.0, r: 0.5 },
-  { x: 2.4, y: 2.75, r: 0.5 },
-  { x: 0.2, y: 5.85, r: 0.5 },
+  { x: 0.7, y: -5.6, r: 0.45 },  // A: first hole, plenty of room
+  { x: -0.8, y: -2.1, r: 0.45 }, // B
+  { x: 1.4, y: -3.2, r: 0.45 },  // B
+  { x: 3.25, y: 1.85, r: 0.45 }, // C, by the arm
+  { x: -2.6, y: -0.25, r: 0.45 },// C, by the arm
 ];
-const pad = { x: -3.1, y: 2.3, s: 0.9 };
-const goal = { x: -3.3, y: 5.8, r: 0.48 };
 
-// ---------- Settings ----------
-const DEFAULTS = { sens: 0.8, maxTilt: 9, fric: 0.35, bounce: 0.3 };
+const pit = { x0: -HW, y0: 4.5, x1: HW, y1: 5.4 };
+
+const gate = { x0: 2.5, x1: HW, y: -4, angle: 0 }; // one-way: up only
+
+const doors = {
+  d1: { x0: 2.0, y0: -1.15, x1: HW, y1: -0.85, open: false, h: 1, color: COL.teal },
+  sun: { x0: 1.95, y0: 5.4, x1: 2.25, y1: HH, open: false, h: 1, color: COL.amber },
+};
+
+const bridge = { x: -0.4, w: 0.9, len: 1.3, down: false, a: Math.PI / 2 }; // swing bridge: a = 0 spans the pit, PI/2 lies along it
+
+const switches = [
+  { id: 's1', x: -3.6, y: -2.5, color: COL.teal },
+  { id: 'sa', x: -3.55, y: 3.2, color: COL.green },
+  { id: 'sb', x: 3.6, y: 3.2, color: COL.amber },
+];
+const SW_R = 0.42;
+
+const arm = { x: 0.35, y: 0.75, len: 1.45, t: 0.11, hub: 0.28, angle: 0, speed: (2 * Math.PI) / 5 };
+
+const sun = { x: 3.35, y: 6.25, r: 0.5 };
+
+function fire(sw) {
+  if (sw.id === 's1') openDoor('d1');
+  if (sw.id === 'sa') setBridge(true);
+  if (sw.id === 'sb') { openDoor('sun'); setBridge(false); }
+}
+
+/* ---------- settings ---------- */
+const DEFAULTS = { sens: 0.8, maxTilt: 9, fric: 0.35, bounce: 0.3, arm: 1 };
 const set = { ...DEFAULTS, still: false, sound: true };
-const G = 42; // board units per second squared
+const G = 42;
 
-// ---------- Renderer ----------
+/* ---------- renderer ---------- */
 const canvas = document.getElementById('c');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -162,166 +171,198 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setClearColor(0xd9d8d4);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
-
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 200);
 const CAM_TIP = THREE.MathUtils.degToRad(15);
-
 scene.add(new THREE.HemisphereLight(0xffffff, 0xb8b4ac, 1.4));
-const sun = new THREE.DirectionalLight(0xfff4e2, 2.2);
-sun.position.set(-6, 18, 8);
-sun.castShadow = true;
-sun.shadow.mapSize.set(1024, 1024);
-Object.assign(sun.shadow.camera, { left: -9, right: 9, top: 10, bottom: -10, near: 1, far: 50 });
-sun.shadow.radius = 4;
-scene.add(sun);
+const sunLight = new THREE.DirectionalLight(0xfff4e2, 2.2);
+sunLight.position.set(-6, 18, 8); sunLight.castShadow = true;
+sunLight.shadow.mapSize.set(1024, 1024);
+Object.assign(sunLight.shadow.camera, { left: -9, right: 9, top: 10, bottom: -10, near: 1, far: 50 });
+scene.add(sunLight);
 
-const board = new THREE.Group();
-scene.add(board);
+const board = new THREE.Group(); scene.add(board);
+const W = (x, y, h = 0) => new THREE.Vector3(x, h, -y);
+const mat = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.8, ...o });
 
-const toWorld = (x, y, h = 0) => new THREE.Vector3(x, h, -y);
-
-// base
-const baseMat = new THREE.MeshStandardMaterial({ color: 0xbdbab3, roughness: 0.9 });
-const base = new THREE.Mesh(new THREE.BoxGeometry(BW + 2 * WALL_T, 0.4, BH + 2 * WALL_T), baseMat);
-base.position.y = -0.2; base.receiveShadow = true;
-board.add(base);
-
-// walls
-const wallMat = new THREE.MeshStandardMaterial({ color: 0x8f8c86, roughness: 0.8 });
-for (const w of walls) {
-  const m = new THREE.Mesh(new THREE.BoxGeometry(w.x1 - w.x0, WALL_H, w.y1 - w.y0), wallMat);
-  m.position.copy(toWorld((w.x0 + w.x1) / 2, (w.y0 + w.y1) / 2, WALL_H / 2));
-  m.castShadow = true; m.receiveShadow = true;
-  board.add(m);
+// base with the pit cut as a separate dark slab
+const base = new THREE.Mesh(new THREE.BoxGeometry(BW + 2 * WT, 0.4, BH + 2 * WT), mat(0xbdbab3, { roughness: 0.9 }));
+base.position.y = -0.2; base.receiveShadow = true; board.add(base);
+const pitMesh = new THREE.Mesh(new THREE.PlaneGeometry(pit.x1 - pit.x0, pit.y1 - pit.y0), new THREE.MeshBasicMaterial({ color: 0x18181a }));
+pitMesh.rotation.x = -Math.PI / 2; pitMesh.position.copy(W((pit.x0 + pit.x1) / 2, (pit.y0 + pit.y1) / 2, 0.003)); board.add(pitMesh);
+for (const y of [pit.y0, pit.y1]) {
+  const lip = new THREE.Mesh(new THREE.BoxGeometry(BW, 0.04, 0.06), mat(0x77746e));
+  lip.position.copy(W(0, y, 0.02)); board.add(lip);
 }
+
+const wallMat = mat(0x8f8c86);
+function boxMesh(w, material, h = WH) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w.x1 - w.x0, h, w.y1 - w.y0), material);
+  m.position.copy(W((w.x0 + w.x1) / 2, (w.y0 + w.y1) / 2, h / 2)); m.castShadow = true; m.receiveShadow = true;
+  board.add(m); return m;
+}
+fixedWalls.forEach(w => boxMesh(w, wallMat));
 
 // holes
-const holeMat = new THREE.MeshBasicMaterial({ color: 0x1a1a1c });
-const rimMat = new THREE.MeshStandardMaterial({ color: 0x77746e, roughness: 0.7 });
+const holeMat = new THREE.MeshBasicMaterial({ color: 0x1a1a1c }), rimMat = mat(0x77746e, { roughness: 0.7 });
 for (const h of holes) {
   const d = new THREE.Mesh(new THREE.CircleGeometry(h.r, 40), holeMat);
-  d.rotation.x = -Math.PI / 2; d.position.copy(toWorld(h.x, h.y, 0.002));
-  board.add(d);
+  d.rotation.x = -Math.PI / 2; d.position.copy(W(h.x, h.y, 0.004)); board.add(d);
   const rim = new THREE.Mesh(new THREE.RingGeometry(h.r, h.r + 0.07, 40), rimMat);
-  rim.rotation.x = -Math.PI / 2; rim.position.copy(toWorld(h.x, h.y, 0.003));
-  board.add(rim);
+  rim.rotation.x = -Math.PI / 2; rim.position.copy(W(h.x, h.y, 0.005)); board.add(rim);
 }
 
-// checkpoint pad
-const padMat = new THREE.MeshStandardMaterial({ color: 0xa9a59d, roughness: 0.6, emissive: 0x000000 });
-const padMesh = new THREE.Mesh(new THREE.BoxGeometry(pad.s, 0.03, pad.s), padMat);
-padMesh.position.copy(toWorld(pad.x, pad.y, 0.015)); padMesh.receiveShadow = true;
-board.add(padMesh);
+// colour studs: small coloured markers on whatever a switch moves
+function stud(x, y, color, h = 0.02) {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.04, 20), mat(color, { roughness: 0.4 }));
+  m.position.copy(W(x, y, h)); board.add(m); return m;
+}
 
-// goal cup
-const goalMat = new THREE.MeshStandardMaterial({ color: 0x8a857c, emissive: 0x000000 });
-const goalDisc = new THREE.Mesh(new THREE.CircleGeometry(goal.r, 40), goalMat);
-goalDisc.rotation.x = -Math.PI / 2; goalDisc.position.copy(toWorld(goal.x, goal.y, 0.002));
-board.add(goalDisc);
-const goalRing = new THREE.Mesh(new THREE.TorusGeometry(goal.r + 0.06, 0.1, 12, 48), new THREE.MeshStandardMaterial({ color: 0xf4f2ee, roughness: 0.4 }));
-goalRing.rotation.x = -Math.PI / 2; goalRing.position.copy(toWorld(goal.x, goal.y, 0.03));
-board.add(goalRing);
+// doors
+for (const [k, d] of Object.entries(doors)) {
+  const slot = new THREE.Mesh(new THREE.PlaneGeometry(d.x1 - d.x0, d.y1 - d.y0), new THREE.MeshBasicMaterial({ color: 0x2a2a2c }));
+  slot.rotation.x = -Math.PI / 2; slot.position.copy(W((d.x0 + d.x1) / 2, (d.y0 + d.y1) / 2, 0.003)); board.add(slot);
+  d.mesh = boxMesh(d, mat(0x8f8c86, { emissive: 0x000000 }));
+  const cx = (d.x0 + d.x1) / 2, cy = (d.y0 + d.y1) / 2;
+  const stripe = new THREE.Mesh(new THREE.BoxGeometry((d.x1 - d.x0) * (k === 'sun' ? 1.04 : 0.9), 0.04, (d.y1 - d.y0) * (k === 'sun' ? 0.9 : 1.04)), mat(d.color, { roughness: 0.4 }));
+  stripe.position.y = WH / 2 + 0.01; d.mesh.add(stripe);
+  // studs on the floor either side so you can still read it once it has dropped
+  if (k === 'd1') { stud(cx - 0.9, cy - 0.35, d.color); stud(cx + 0.9, cy - 0.35, d.color); }
+  else { stud(cx - 0.35, cy - 0.6, d.color); stud(cx - 0.35, cy + 0.6, d.color); }
+}
 
-// ball, with a pattern so you can see it roll
+// gate (one-way flap) with painted chevrons
+const gateHinge = new THREE.Group(); gateHinge.position.copy(W((gate.x0 + gate.x1) / 2, gate.y, WH)); board.add(gateHinge);
+const gateFlap = new THREE.Mesh(new THREE.BoxGeometry(gate.x1 - gate.x0 - 0.06, WH, 0.08), mat(0xa7a39b));
+gateFlap.position.y = -WH / 2; gateFlap.castShadow = true; gateHinge.add(gateFlap);
+for (const cy of [-4.9, -4.55]) {
+  const shape = new THREE.Shape(); shape.moveTo(-0.3, 0); shape.lineTo(0, 0.2); shape.lineTo(0.3, 0); shape.lineTo(0.3, -0.08); shape.lineTo(0, 0.12); shape.lineTo(-0.3, -0.08);
+  const chev = new THREE.Mesh(new THREE.ShapeGeometry(shape), new THREE.MeshBasicMaterial({ color: 0x8d8a84 }));
+  chev.rotation.x = -Math.PI / 2; chev.position.copy(W(3.5, cy, 0.006)); board.add(chev);
+}
+
+// swing bridge on a pivot in the middle of the pit
+const bridgeHinge = new THREE.Group(); bridgeHinge.position.copy(W(bridge.x, (pit.y0 + pit.y1) / 2, 0.02)); board.add(bridgeHinge);
+const plank = new THREE.Mesh(new THREE.BoxGeometry(bridge.w, 0.06, bridge.len), mat(0xa7a39b));
+plank.position.y = 0.03; plank.castShadow = true; plank.receiveShadow = true; bridgeHinge.add(plank);
+const drum = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.08, 20), mat(0x6f6c66));
+drum.position.y = 0.08; bridgeHinge.add(drum);
+const bGreen = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.04, 20), mat(COL.green, { roughness: 0.4 }));
+bGreen.position.set(0, 0.08, 0.42); bridgeHinge.add(bGreen);
+const bAmber = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.04, 20), mat(COL.amber, { roughness: 0.4 }));
+bAmber.position.set(0, 0.08, -0.42); bridgeHinge.add(bAmber);
+
+// switches with lamps
+for (const sw of switches) {
+  const pad = new THREE.Mesh(new THREE.CylinderGeometry(SW_R, SW_R, 0.04, 32), mat(0xa9a59d, { roughness: 0.5 }));
+  pad.position.copy(W(sw.x, sw.y, 0.02)); pad.receiveShadow = true; board.add(pad);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(SW_R, 0.04, 8, 40), mat(sw.color, { roughness: 0.4 }));
+  ring.rotation.x = -Math.PI / 2; ring.position.copy(W(sw.x, sw.y, 0.04)); board.add(ring);
+  // lamp on a short post beside the pad
+  const lx = sw.x, ly = sw.y + 0.62;
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.45, 10), mat(0x77746e));
+  post.position.copy(W(lx, ly, 0.225)); board.add(post);
+  sw.lampMat = new THREE.MeshStandardMaterial({ color: 0xd8d4cc, roughness: 0.3, emissive: 0x000000 });
+  sw.lamp = new THREE.Mesh(new THREE.SphereGeometry(0.15, 20, 12), sw.lampMat);
+  sw.lamp.position.copy(W(lx, ly, 0.5)); sw.lamp.castShadow = true; board.add(sw.lamp);
+  sw.padMat = pad.material;
+}
+
+// turning arm
+const armGroup = new THREE.Group(); armGroup.position.copy(W(arm.x, arm.y, 0)); board.add(armGroup);
+const hub = new THREE.Mesh(new THREE.CylinderGeometry(arm.hub, arm.hub, WH + 0.1, 24), mat(0x6f6c66));
+hub.position.y = (WH + 0.1) / 2; hub.castShadow = true; armGroup.add(hub);
+const blade = new THREE.Mesh(new THREE.BoxGeometry(arm.len, WH * 0.8, arm.t * 2), mat(0x6f6c66));
+blade.position.set(arm.len / 2, WH * 0.4, 0); blade.castShadow = true; armGroup.add(blade);
+const sweep = new THREE.Mesh(new THREE.RingGeometry(arm.len - 0.03, arm.len + 0.03, 64), new THREE.MeshBasicMaterial({ color: 0xa6a29a }));
+sweep.rotation.x = -Math.PI / 2; sweep.position.copy(W(arm.x, arm.y, 0.004)); board.add(sweep);
+
+// sun cup
+const sunMat = mat(0x8a857c, { emissive: 0x000000 });
+const sunDisc = new THREE.Mesh(new THREE.CircleGeometry(sun.r, 40), sunMat);
+sunDisc.rotation.x = -Math.PI / 2; sunDisc.position.copy(W(sun.x, sun.y, 0.004)); board.add(sunDisc);
+const sunRing = new THREE.Mesh(new THREE.TorusGeometry(sun.r + 0.06, 0.1, 12, 48), mat(0xf4f2ee, { roughness: 0.4 }));
+sunRing.rotation.x = -Math.PI / 2; sunRing.position.copy(W(sun.x, sun.y, 0.03)); board.add(sunRing);
+const sunGlow = new THREE.PointLight(0xffc066, 0, 4); sunGlow.position.copy(W(sun.x, sun.y, 0.6)); board.add(sunGlow);
+
+// ball with a pattern so the roll reads
 function ballTexture() {
-  const c = document.createElement('canvas'); c.width = 256; c.height = 128;
-  const g = c.getContext('2d');
-  g.fillStyle = '#e9e7e2'; g.fillRect(0, 0, 256, 128);
-  g.fillStyle = '#3a3b3f'; g.fillRect(0, 56, 256, 16);
-  g.fillStyle = '#c8562f';
-  for (let i = 0; i < 6; i++) { g.beginPath(); g.arc(20 + i * 43, 26 + (i % 2) * 76, 9, 0, Math.PI * 2); g.fill(); }
+  const c = document.createElement('canvas'); c.width = 256; c.height = 128; const g = c.getContext('2d');
+  g.fillStyle = '#e9e7e2'; g.fillRect(0, 0, 256, 128); g.fillStyle = '#3a3b3f'; g.fillRect(0, 56, 256, 16);
+  g.fillStyle = '#c8562f'; for (let i = 0; i < 6; i++) { g.beginPath(); g.arc(20 + i * 43, 26 + (i % 2) * 76, 9, 0, Math.PI * 2); g.fill(); }
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
 }
-const ball = new THREE.Mesh(
-  new THREE.SphereGeometry(BALL_R, 40, 24),
-  new THREE.MeshStandardMaterial({ map: ballTexture(), roughness: 0.35, metalness: 0.1 })
-);
-ball.castShadow = true;
-board.add(ball);
+const ball = new THREE.Mesh(new THREE.SphereGeometry(BALL_R, 40, 24), new THREE.MeshStandardMaterial({ map: ballTexture(), roughness: 0.35, metalness: 0.1 }));
+ball.castShadow = true; board.add(ball);
 
-// ---------- State ----------
+/* ---------- state ---------- */
 const s = {
-  x: START.x, y: START.y, vx: 0, vy: 0,
-  mode: 'idle',      // idle | play | fall | win
-  t: 0, checkpoint: { ...START }, padLit: false,
-  tiltX: 0, tiltY: 0, // board angles in radians (positive tiltX rolls ball +x)
-  targetX: 0, targetY: 0,
-  control: 'drag', falls: 0, fallT: 0, h: BALL_R, scale: 1,
+  x: START.x, y: START.y, vx: 0, vy: 0, h: BALL_R,
+  mode: 'idle', control: 'drag', tiltX: 0, tiltY: 0, targetX: 0, targetY: 0,
+  checkpoint: { ...START }, falls: 0, litOrder: [], fallAt: null, fallT: 0, startTime: 0,
 };
 
-// ---------- Input: drag ----------
-const stick = document.getElementById('stick');
-const knob = stick.querySelector('i');
-let drag = null;
-const DRAG_R = 60;
+function openDoor(k) {
+  const d = doors[k]; if (d.open) return; d.open = true;
+  audio.slide();
+}
+function setBridge(down) {
+  if (bridge.down === down) return; bridge.down = down; audio.slide(down ? 0.9 : 1.2);
+}
+
+/* ---------- input ---------- */
+const stick = document.getElementById('stick'), knob = stick.querySelector('i');
+let drag = null; const DRAG_R = 60;
 canvas.addEventListener('pointerdown', e => {
   if (s.mode !== 'play') return;
   canvas.setPointerCapture(e.pointerId);
   drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, dx: 0, dy: 0 };
-  stick.style.left = e.clientX + 'px'; stick.style.top = e.clientY + 'px';
-  knob.style.transform = 'translate(0,0)';
-  stick.classList.remove('hidden');
-  audio.unlock();
+  stick.style.left = e.clientX + 'px'; stick.style.top = e.clientY + 'px'; knob.style.transform = 'translate(0,0)';
+  stick.classList.remove('hidden'); audio.unlock();
 });
 canvas.addEventListener('pointermove', e => {
   if (!drag || e.pointerId !== drag.id) return;
-  let dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
-  const len = Math.hypot(dx, dy);
+  let dx = e.clientX - drag.x0, dy = e.clientY - drag.y0; const len = Math.hypot(dx, dy);
   if (len > DRAG_R) { dx *= DRAG_R / len; dy *= DRAG_R / len; }
-  drag.dx = dx; drag.dy = dy;
-  knob.style.transform = `translate(${dx}px,${dy}px)`;
+  drag.dx = dx; drag.dy = dy; knob.style.transform = `translate(${dx}px,${dy}px)`;
 });
 const endDrag = e => { if (drag && e.pointerId === drag.id) { drag = null; stick.classList.add('hidden'); } };
-canvas.addEventListener('pointerup', endDrag);
-canvas.addEventListener('pointercancel', endDrag);
-
-// keyboard
+canvas.addEventListener('pointerup', endDrag); canvas.addEventListener('pointercancel', endDrag);
 const keys = new Set();
 addEventListener('keydown', e => { if (e.key.startsWith('Arrow')) { keys.add(e.key); e.preventDefault(); } });
 addEventListener('keyup', e => keys.delete(e.key));
 
-// ---------- Input: tilt ----------
 let tiltRef = null, tiltLast = null, tiltSeen = false;
 function onOrient(e) {
   if (e.beta == null || e.gamma == null) return;
-  tiltSeen = true;
-  tiltLast = { b: e.beta, g: e.gamma };
-  if (!tiltRef) tiltRef = { ...tiltLast };
+  tiltSeen = true; tiltLast = { b: e.beta, g: e.gamma }; if (!tiltRef) tiltRef = { ...tiltLast };
 }
 async function enableTilt() {
   try {
-    if (typeof DeviceOrientationEvent === 'undefined') throw new Error('none');
+    if (typeof DeviceOrientationEvent === 'undefined') throw 0;
     if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-      const r = await DeviceOrientationEvent.requestPermission();
-      if (r !== 'granted') throw new Error('denied');
+      if (await DeviceOrientationEvent.requestPermission() !== 'granted') throw 0;
     }
     addEventListener('deviceorientation', onOrient);
     await new Promise(r => setTimeout(r, 1200));
-    if (!tiltSeen) throw new Error('silent');
+    if (!tiltSeen) throw 0;
     return true;
-  } catch (err) {
-    removeEventListener('deviceorientation', onOrient);
-    return false;
-  }
+  } catch (e) { removeEventListener('deviceorientation', onOrient); return false; }
 }
 
-// ---------- Audio ----------
+/* ---------- audio ---------- */
 const audio = {
-  ctx: null, roll: null, rollGain: null,
+  ctx: null,
   unlock() {
     if (this.ctx) { if (this.ctx.state === 'suspended') this.ctx.resume(); return; }
     try {
-      const C = window.AudioContext || window.webkitAudioContext;
-      this.ctx = new C();
-      // rolling: looped brown-ish noise through a low-pass
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
       const len = this.ctx.sampleRate * 2, buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate), d = buf.getChannelData(0);
       let last = 0; for (let i = 0; i < len; i++) { last = (last + 0.02 * (Math.random() * 2 - 1)) / 1.02; d[i] = last * 3.5; }
       const src = this.ctx.createBufferSource(); src.buffer = buf; src.loop = true;
-      const lp = this.ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 500;
+      this.lp = this.ctx.createBiquadFilter(); this.lp.type = 'lowpass'; this.lp.frequency.value = 500;
       this.rollGain = this.ctx.createGain(); this.rollGain.gain.value = 0;
-      src.connect(lp).connect(this.rollGain).connect(this.ctx.destination); src.start();
-      this.lp = lp;
+      src.connect(this.lp).connect(this.rollGain).connect(this.ctx.destination); src.start();
     } catch (e) { this.ctx = null; }
   },
   rolling(speed) {
@@ -333,250 +374,244 @@ const audio = {
   tone(freq, dur, type = 'sine', vol = 0.25, slideTo) {
     if (!this.ctx || !set.sound) return;
     const t = this.ctx.currentTime, o = this.ctx.createOscillator(), g = this.ctx.createGain();
-    o.type = type; o.frequency.setValueAtTime(freq, t);
-    if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+    o.type = type; o.frequency.setValueAtTime(freq, t); if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
     g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     o.connect(g).connect(this.ctx.destination); o.start(t); o.stop(t + dur + 0.02);
   },
-  tick(strength) {
+  noise(dur, freq, vol, q = 1.2) {
     if (!this.ctx || !set.sound) return;
-    const t = this.ctx.currentTime, n = this.ctx.createBufferSource();
-    const b = this.ctx.createBuffer(1, 1200, this.ctx.sampleRate), d = b.getChannelData(0);
-    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 6);
-    n.buffer = b;
-    const bp = this.ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1800; bp.Q.value = 1.2;
-    const g = this.ctx.createGain(); g.gain.value = Math.min(strength / 6, 1) * 0.9;
-    n.connect(bp).connect(g).connect(this.ctx.destination); n.start(t);
+    const n = this.ctx.createBufferSource(), len = Math.floor(this.ctx.sampleRate * dur);
+    const b = this.ctx.createBuffer(1, len, this.ctx.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+    n.buffer = b; const bp = this.ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = freq; bp.Q.value = q;
+    const g = this.ctx.createGain(); g.gain.value = vol; n.connect(bp).connect(g).connect(this.ctx.destination); n.start();
   },
+  tick(strength) { this.noise(0.03, 1800, Math.min(strength / 6, 1) * 0.9); },
+  slide(p = 1) { this.noise(0.45, 300 * p, 0.5, 0.8); this.tone(90 * p, 0.35, 'triangle', 0.15, 60 * p); },
+  chime(color) { const f = color === COL.teal ? 587 : color === COL.green ? 659 : 784; this.tone(f, 0.3, 'sine', 0.2); setTimeout(() => this.tone(f * 1.5, 0.45, 'sine', 0.16), 110); },
+  clunk() { this.tone(140, 0.45, 'sine', 0.45, 55); },
 };
 
-// ---------- Physics ----------
+/* ---------- physics ---------- */
 let lastHit = 0;
-function collideWalls() {
-  for (const w of walls) {
-    const cx = Math.max(w.x0, Math.min(s.x, w.x1));
-    const cy = Math.max(w.y0, Math.min(s.y, w.y1));
-    let dx = s.x - cx, dy = s.y - cy;
-    let d = Math.hypot(dx, dy);
-    if (d >= BALL_R) continue;
-    let nx, ny;
-    if (d < 1e-6) {
-      // centre inside the wall: push out along the shortest axis
-      const pen = [[s.x - w.x0, -1, 0], [w.x1 - s.x, 1, 0], [s.y - w.y0, 0, -1], [w.y1 - s.y, 0, 1]].sort((a, b) => a[0] - b[0])[0];
-      nx = pen[1]; ny = pen[2]; d = -pen[0];
-    } else { nx = dx / d; ny = dy / d; }
-    const push = BALL_R - d;
-    s.x += nx * push; s.y += ny * push;
-    const vn = s.vx * nx + s.vy * ny;
-    if (vn < 0) {
-      s.vx -= (1 + set.bounce) * vn * nx; s.vy -= (1 + set.bounce) * vn * ny;
-      const now = performance.now();
-      if (-vn > 0.8 && now - lastHit > 40) { audio.tick(-vn); lastHit = now; }
-    }
+function hitSound(vn) { const now = performance.now(); if (vn > 0.8 && now - lastHit > 40) { audio.tick(vn); lastHit = now; } }
+
+function collideBox(w, oneWayUp = false) {
+  const cx = Math.max(w.x0, Math.min(s.x, w.x1)), cy = Math.max(w.y0, Math.min(s.y, w.y1));
+  let dx = s.x - cx, dy = s.y - cy, d = Math.hypot(dx, dy);
+  if (d >= BALL_R) return;
+  let nx, ny;
+  if (d < 1e-6) {
+    const pen = [[s.x - w.x0, -1, 0], [w.x1 - s.x, 1, 0], [s.y - w.y0, 0, -1], [w.y1 - s.y, 0, 1]].sort((a, b) => a[0] - b[0])[0];
+    nx = pen[1]; ny = pen[2]; d = -pen[0];
+  } else { nx = dx / d; ny = dy / d; }
+  if (oneWayUp && ny < 0.5) return; // only blocks a ball coming back down from above
+  s.x += nx * (BALL_R - d); s.y += ny * (BALL_R - d);
+  const vn = s.vx * nx + s.vy * ny;
+  if (vn < 0) { s.vx -= (1 + set.bounce) * vn * nx; s.vy -= (1 + set.bounce) * vn * ny; hitSound(-vn); }
+}
+
+function collideArm() {
+  const a = arm.angle, tx = arm.x + Math.cos(a) * arm.len, ty = arm.y + Math.sin(a) * arm.len;
+  // hub
+  let dx = s.x - arm.x, dy = s.y - arm.y, d = Math.hypot(dx, dy), rr = arm.hub + BALL_R;
+  if (d < rr && d > 1e-6) {
+    const nx = dx / d, ny = dy / d; s.x += nx * (rr - d); s.y += ny * (rr - d);
+    const vn = s.vx * nx + s.vy * ny; if (vn < 0) { s.vx -= (1 + set.bounce) * vn * nx; s.vy -= (1 + set.bounce) * vn * ny; hitSound(-vn); }
   }
+  // blade
+  const ex = tx - arm.x, ey = ty - arm.y, L2 = ex * ex + ey * ey;
+  const u = Math.max(0, Math.min(1, ((s.x - arm.x) * ex + (s.y - arm.y) * ey) / L2));
+  const px = arm.x + ex * u, py = arm.y + ey * u;
+  dx = s.x - px; dy = s.y - py; d = Math.hypot(dx, dy); rr = arm.t + BALL_R;
+  if (d < rr && d > 1e-6) {
+    const nx = dx / d, ny = dy / d; s.x += nx * (rr - d); s.y += ny * (rr - d);
+    const w = arm.speed * set.arm, vpx = -w * (py - arm.y), vpy = w * (px - arm.x);
+    const rvx = s.vx - vpx, rvy = s.vy - vpy, vn = rvx * nx + rvy * ny;
+    if (vn < 0) { s.vx -= (1 + set.bounce) * vn * nx; s.vy -= (1 + set.bounce) * vn * ny; hitSound(-vn); }
+  }
+}
+
+function onBridge() {
+  return bridge.a < 0.15 && Math.abs(s.x - bridge.x) < bridge.w / 2 - 0.05;
 }
 
 function step(dt) {
-  const ax = G * Math.sin(s.tiltX) * 5 / 7;
-  const ay = G * Math.sin(s.tiltY) * 5 / 7;
-  s.vx += ax * dt; s.vy += ay * dt;
-
-  // hole lip: a gentle pull once the ball overhangs the edge
+  const k = 5 / 7;
+  s.vx += G * Math.sin(s.tiltX) * k * dt; s.vy += G * Math.sin(s.tiltY) * k * dt;
   for (const h of holes) {
-    const dx = h.x - s.x, dy = h.y - s.y, d = Math.hypot(dx, dy);
-    if (d < h.r + BALL_R * 0.35 && d > 1e-4) {
-      const pull = 14 * (1 - d / (h.r + BALL_R * 0.35));
-      s.vx += dx / d * pull * dt; s.vy += dy / d * pull * dt;
-    }
+    const dx = h.x - s.x, dy = h.y - s.y, d = Math.hypot(dx, dy), edge = h.r + BALL_R * 0.35;
+    if (d < edge && d > 1e-4) { const pull = 14 * (1 - d / edge); s.vx += dx / d * pull * dt; s.vy += dy / d * pull * dt; }
   }
-
-  const damp = Math.max(0, 1 - set.fric * dt);
-  s.vx *= damp; s.vy *= damp;
-  const sp = Math.hypot(s.vx, s.vy), MAX = 18;
-  if (sp > MAX) { s.vx *= MAX / sp; s.vy *= MAX / sp; }
-
+  const damp = Math.max(0, 1 - set.fric * dt); s.vx *= damp; s.vy *= damp;
+  const sp = Math.hypot(s.vx, s.vy); if (sp > 18) { s.vx *= 18 / sp; s.vy *= 18 / sp; }
   s.x += s.vx * dt; s.y += s.vy * dt;
-  collideWalls();
 
-  // events
-  for (const h of holes) {
-    if (Math.hypot(h.x - s.x, h.y - s.y) < h.r - 0.08) { startFall(h); return; }
+  for (const w of fixedWalls) collideBox(w);
+  for (const d of Object.values(doors)) if (d.h > 0.3) collideBox(d);
+  collideBox({ x0: gate.x0, x1: gate.x1, y0: gate.y - 0.06, y1: gate.y + 0.06 }, true);
+  collideArm();
+
+  // falling
+  for (const h of holes) if (Math.hypot(h.x - s.x, h.y - s.y) < h.r - 0.08) return startFall(h.x, h.y);
+  if (s.y > pit.y0 + 0.12 && s.y < pit.y1 - 0.12 && !onBridge()) return startFall(s.x, (pit.y0 + pit.y1) / 2);
+
+  // switches: fire on entry
+  for (const sw of switches) {
+    const inside = Math.hypot(sw.x - s.x, sw.y - s.y) < SW_R - 0.05;
+    if (inside && !sw.inside) {
+      s.checkpoint = { x: sw.x, y: sw.y };
+      if (!s.litOrder.includes(sw)) { s.litOrder.push(sw); sw.lampMat.color.set(sw.color); sw.lampMat.emissive.set(sw.color); sw.lampMat.emissiveIntensity = 0.8; }
+      audio.chime(sw.color); sw.flash = 1;
+      fire(sw);
+    }
+    sw.inside = inside;
   }
-  if (!s.padLit && Math.abs(s.x - pad.x) < pad.s / 2 && Math.abs(s.y - pad.y) < pad.s / 2) {
-    s.padLit = true; s.checkpoint = { x: pad.x, y: pad.y };
-    padMat.color.set(0xf0c25a); padMat.emissive.set(0x6b4300);
-    audio.tone(660, 0.25, 'sine', 0.2); setTimeout(() => audio.tone(990, 0.35, 'sine', 0.18), 110);
-    toast('Pad lit. Holes now bring you back here.');
-  }
-  if (Math.hypot(goal.x - s.x, goal.y - s.y) < goal.r - 0.12) win();
+  if (Math.hypot(sun.x - s.x, sun.y - s.y) < sun.r - 0.12) win();
 }
 
-let fallHole = null;
-function startFall(h) {
-  s.mode = 'fall'; s.fallT = 0; fallHole = h; s.falls++;
-  audio.tone(140, 0.45, 'sine', 0.45, 55);
-}
+function startFall(x, y) { s.mode = 'fall'; s.fallT = 0; s.fallAt = { x, y }; s.falls++; audio.clunk(); }
 function respawn() {
-  s.x = s.checkpoint.x; s.y = s.checkpoint.y; s.vx = 0; s.vy = 0; s.h = BALL_R; s.scale = 1;
-  ball.quaternion.identity();
+  s.x = s.checkpoint.x; s.y = s.checkpoint.y; s.vx = 0; s.vy = 0; s.h = BALL_R; ball.quaternion.identity();
+  for (const sw of switches) sw.inside = Math.hypot(sw.x - s.x, sw.y - s.y) < SW_R - 0.05;
   s.mode = 'play';
 }
 function win() {
-  s.mode = 'win';
-  goalMat.emissive.set(0xa36a10); goalMat.color.set(0xf0c25a);
-  [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => audio.tone(f, 0.5, 'sine', 0.16), i * 120));
+  s.mode = 'win'; s.winT = 0;
+  const secs = Math.round((performance.now() - s.startTime) / 1000);
+  const m = Math.floor(secs / 60), sec = secs % 60;
   document.getElementById('winText').textContent =
-    s.falls === 0 ? 'No falls. Again, or open Tune and change how it feels.' :
-    `Again, or open Tune and change how it feels.`;
-  setTimeout(() => document.getElementById('win').classList.remove('hidden'), 700);
+    `${m ? m + ' min ' : ''}${sec} sec, ${s.falls === 0 ? 'no falls' : s.falls === 1 ? 'one fall' : s.falls + ' falls'}.`;
+  setTimeout(() => document.getElementById('win').classList.remove('hidden'), 400 + s.litOrder.length * 350 + 400);
 }
 function reset() {
-  s.checkpoint = { ...START }; s.padLit = false; s.falls = 0;
-  padMat.color.set(0xa9a59d); padMat.emissive.set(0x000000);
-  goalMat.emissive.set(0x000000); goalMat.color.set(0x8a857c);
+  s.checkpoint = { ...START }; s.falls = 0; s.litOrder = [];
+  for (const d of Object.values(doors)) { d.open = false; }
+  bridge.down = false; arm.angle = 0;
+  for (const sw of switches) { sw.lampMat.color.set(0xd8d4cc); sw.lampMat.emissive.set(0x000000); sw.inside = false; sw.flash = 0; }
+  sunMat.color.set(0x8a857c); sunMat.emissive.set(0x000000); sunGlow.intensity = 0;
+  s.startTime = performance.now();
   respawn();
 }
 
-// ---------- Tilt targets ----------
-function recalibrate(show = true) {
-  if (tiltLast) tiltRef = { ...tiltLast };
-  if (show) toast('This angle is now flat.');
-}
+/* ---------- tilt targets ---------- */
+function recalibrate(show = true) { if (tiltLast) tiltRef = { ...tiltLast }; if (show) toast('This angle is now flat.'); }
 function updateTargets() {
-  const max = THREE.MathUtils.degToRad(set.maxTilt);
-  let tx = 0, ty = 0;
+  const max = THREE.MathUtils.degToRad(set.maxTilt); let tx = 0, ty = 0;
   if (s.control === 'tilt' && tiltLast && tiltRef) {
-    // gamma: right edge down is positive. beta: top edge tipping away from you is lower.
     tx = THREE.MathUtils.degToRad((tiltLast.g - tiltRef.g) * set.sens);
     ty = THREE.MathUtils.degToRad((tiltRef.b - tiltLast.b) * set.sens);
   }
-  if (drag) {
-    tx = (drag.dx / DRAG_R) * max * Math.min(1, set.sens / 0.8);
-    ty = (-drag.dy / DRAG_R) * max * Math.min(1, set.sens / 0.8);
-  }
+  if (drag) { const f = max * Math.min(1, set.sens / 0.8); tx = drag.dx / DRAG_R * f; ty = -drag.dy / DRAG_R * f; }
   if (keys.size) {
-    if (keys.has('ArrowLeft')) tx = -max * 0.7;
-    if (keys.has('ArrowRight')) tx = max * 0.7;
-    if (keys.has('ArrowUp')) ty = max * 0.7;
-    if (keys.has('ArrowDown')) ty = -max * 0.7;
+    if (keys.has('ArrowLeft')) tx = -max * 0.7; if (keys.has('ArrowRight')) tx = max * 0.7;
+    if (keys.has('ArrowUp')) ty = max * 0.7; if (keys.has('ArrowDown')) ty = -max * 0.7;
   }
-  s.targetX = Math.max(-max, Math.min(max, tx));
-  s.targetY = Math.max(-max, Math.min(max, ty));
+  s.targetX = Math.max(-max, Math.min(max, tx)); s.targetY = Math.max(-max, Math.min(max, ty));
 }
 
-// ---------- Camera fit ----------
+/* ---------- camera ---------- */
 function resize() {
-  const w = innerWidth, h = innerHeight;
-  renderer.setSize(w, h, false);
-  camera.aspect = w / h;
-  const vfov = THREE.MathUtils.degToRad(camera.fov);
-  const needH = (BH + 1.6) / 2, needW = (BW + 1.4) / 2;
-  const hfov = 2 * Math.atan(Math.tan(vfov / 2) * camera.aspect);
-  const d = Math.max(needH / Math.tan(vfov / 2), needW / Math.tan(hfov / 2)) * 1.06;
-  camera.position.set(0, d * Math.cos(CAM_TIP), d * Math.sin(CAM_TIP));
-  camera.lookAt(0, 0, -0.3);
-  camera.updateProjectionMatrix();
+  const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h;
+  const vfov = THREE.MathUtils.degToRad(camera.fov), hfov = 2 * Math.atan(Math.tan(vfov / 2) * camera.aspect);
+  const d = Math.max((BH + 1.6) / 2 / Math.tan(vfov / 2), (BW + 1.4) / 2 / Math.tan(hfov / 2)) * 1.06;
+  camera.position.set(0, d * Math.cos(CAM_TIP), d * Math.sin(CAM_TIP)); camera.lookAt(0, 0, -0.3); camera.updateProjectionMatrix();
 }
-addEventListener('resize', resize);
-resize();
+addEventListener('resize', resize); resize();
 
-// ---------- Loop ----------
+/* ---------- loop ---------- */
 const q = new THREE.Quaternion(), axis = new THREE.Vector3();
 let prev = performance.now();
 function frame(now) {
   const dt = Math.min(0.05, (now - prev) / 1000); prev = now;
   if (s.mode === 'play' || s.mode === 'fall') updateTargets(); else { s.targetX = 0; s.targetY = 0; }
   const ease = 1 - Math.exp(-dt * (drag || keys.size ? 14 : s.control === 'tilt' ? 20 : 8));
-  s.tiltX += (s.targetX - s.tiltX) * ease;
-  s.tiltY += (s.targetY - s.tiltY) * ease;
+  s.tiltX += (s.targetX - s.tiltX) * ease; s.tiltY += (s.targetY - s.tiltY) * ease;
+
+  // world pieces keep moving whenever the level is live
+  if (s.mode !== 'idle') arm.angle += arm.speed * set.arm * dt;
+  for (const d of Object.values(doors)) d.h += ((d.open ? 0 : 1) - d.h) * Math.min(1, dt * 5);
+  const targetA = bridge.down ? 0 : Math.PI / 2; bridge.a += (targetA - bridge.a) * Math.min(1, dt * 4);
 
   if (s.mode === 'play') {
-    const sub = 4;
-    for (let i = 0; i < sub && s.mode === 'play'; i++) step(dt / sub);
+    const sub = 4; for (let i = 0; i < sub && s.mode === 'play'; i++) step(dt / sub);
     const sp = Math.hypot(s.vx, s.vy);
-    if (sp > 1e-4) {
-      axis.set(-s.vy, 0, -s.vx).normalize();
-      q.setFromAxisAngle(axis, sp * dt / BALL_R);
-      ball.quaternion.premultiply(q);
-    }
+    if (sp > 1e-4) { axis.set(-s.vy, 0, -s.vx).normalize(); q.setFromAxisAngle(axis, sp * dt / BALL_R); ball.quaternion.premultiply(q); }
     audio.rolling(sp);
-  } else {
-    audio.rolling(0);
-  }
+    // gate flap swings while the ball passes under it
+    const under = s.x > gate.x0 && s.x < gate.x1 && Math.abs(s.y - gate.y) < BALL_R + 0.1;
+    gate.angle += ((under ? 1.25 : 0) - gate.angle) * Math.min(1, dt * (under ? 18 : 4));
+  } else audio.rolling(0);
 
   if (s.mode === 'fall') {
-    s.fallT += dt;
-    const k = Math.min(1, s.fallT / 0.35);
-    s.x += (fallHole.x - s.x) * Math.min(1, dt * 12);
-    s.y += (fallHole.y - s.y) * Math.min(1, dt * 12);
+    s.fallT += dt; const k = Math.min(1, s.fallT / 0.35);
+    s.x += (s.fallAt.x - s.x) * Math.min(1, dt * 12); s.y += (s.fallAt.y - s.y) * Math.min(1, dt * 12);
     s.h = BALL_R - k * BALL_R * 2.4;
     if (s.fallT > 0.75) respawn();
   }
   if (s.mode === 'win') {
-    s.x += (goal.x - s.x) * Math.min(1, dt * 8); s.y += (goal.y - s.y) * Math.min(1, dt * 8);
+    s.winT += dt;
+    s.x += (sun.x - s.x) * Math.min(1, dt * 8); s.y += (sun.y - s.y) * Math.min(1, dt * 8);
     s.h += (BALL_R * 0.25 - s.h) * Math.min(1, dt * 6);
+    // every lamp you lit glows in turn, then the sun
+    s.litOrder.forEach((sw, i) => { const t = s.winT - 0.3 - i * 0.35; if (t > 0 && t < 0.05) { sw.flash = 1.4; audio.chime(sw.color); } });
+    const sunT = s.winT - 0.3 - s.litOrder.length * 0.35;
+    if (sunT > 0) { sunMat.color.set(0xf0c25a); sunMat.emissive.set(0xa36a10); sunGlow.intensity = Math.min(6, sunT * 12); if (sunT < 0.05) [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => audio.tone(f, 0.5, 'sine', 0.16), i * 110)); }
   }
 
-  ball.position.copy(toWorld(s.x, s.y, s.h));
-  if (set.still) { board.rotation.set(0, 0, 0); }
-  else { board.rotation.set(-s.tiltY, 0, -s.tiltX); }
-
+  // visuals
+  ball.position.copy(W(s.x, s.y, s.h));
+  armGroup.rotation.y = arm.angle;
+  for (const d of Object.values(doors)) d.mesh.position.y = WH / 2 - (1 - d.h) * (WH + 0.12);
+  bridgeHinge.rotation.y = bridge.a;
+  gateHinge.rotation.x = gate.angle;
+  for (const sw of switches) {
+    sw.flash = Math.max(0, (sw.flash || 0) - dt * 2);
+    const lit = s.litOrder.includes(sw);
+    sw.lampMat.emissiveIntensity = lit ? 0.8 + sw.flash * 1.5 : 0;
+    sw.lamp.scale.setScalar(1 + sw.flash * 0.25);
+  }
+  if (set.still) board.rotation.set(0, 0, 0); else board.rotation.set(-s.tiltY, 0, -s.tiltX);
   renderer.render(scene, camera);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
 
-// ---------- UI ----------
+/* ---------- UI ---------- */
 const $ = id => document.getElementById(id);
 let toastTimer;
-function toast(msg, ms = 2600) {
-  const t = $('toast'); t.textContent = msg; t.classList.add('show');
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), ms);
-}
+function toast(msg, ms = 2600) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), ms); }
 function begin(control) {
-  s.control = control;
-  $('start').classList.add('hidden');
-  $('hint').classList.toggle('hidden', false);
-  $('hint').textContent = control === 'tilt'
-    ? 'Tilt the phone. You can still drag with a thumb.'
-    : 'Drag anywhere to tilt the board. Arrow keys work too.';
-  $('btnRecal').classList.toggle('hidden', control !== 'tilt');
+  s.control = control; $('start').classList.add('hidden'); $('hint').classList.remove('hidden');
+  $('hint').textContent = control === 'tilt' ? 'Tilt the phone. You can still drag with a thumb.' : 'Drag anywhere to tilt the board. Arrow keys work too.';
+  $('btnRecal').classList.toggle('hidden', control !== 'tilt'); $('btnRestart').classList.remove('hidden');
   reset();
 }
 $('btnTilt').onclick = async () => {
-  audio.unlock();
-  $('btnTilt').textContent = 'Checking…';
-  const ok = await enableTilt();
-  $('btnTilt').textContent = 'Use tilt';
+  audio.unlock(); $('btnTilt').textContent = 'Checking…'; const ok = await enableTilt(); $('btnTilt').textContent = 'Use tilt';
   if (ok) { recalibrate(false); begin('tilt'); toast('Hold the phone how you like. That angle is flat.'); }
   else { begin('drag'); toast('Tilt isn’t available in this window, so drag is on.', 4200); }
 };
 $('btnDrag').onclick = () => { audio.unlock(); begin('drag'); };
 $('btnAgain').onclick = () => { $('win').classList.add('hidden'); reset(); };
+$('btnRestart').onclick = () => { $('win').classList.add('hidden'); reset(); };
 $('btnRecal').onclick = () => recalibrate(true);
 
-const sliders = [['sens', 'vSens', v => v.toFixed(2)], ['maxTilt', 'vMax', v => v + '°'], ['fric', 'vFric', v => v.toFixed(2)], ['bounce', 'vBounce', v => v.toFixed(2)]];
-function syncSliders() {
-  for (const [id, out, fmt] of sliders) { $(id).value = set[id]; $(out).textContent = fmt(+set[id]); }
-  $('still').checked = set.still; $('sound').checked = set.sound;
-}
+const sliders = [['sens', 'vSens', v => v.toFixed(2)], ['maxTilt', 'vMax', v => v + '°'], ['fric', 'vFric', v => v.toFixed(2)], ['bounce', 'vBounce', v => v.toFixed(2)], ['arm', 'vArm', v => v.toFixed(1) + '×']];
+function syncSliders() { for (const [id, out, fmt] of sliders) { $(id).value = set[id]; $(out).textContent = fmt(+set[id]); } $('still').checked = set.still; $('sound').checked = set.sound; }
 for (const [id, out, fmt] of sliders) $(id).addEventListener('input', e => { set[id] = +e.target.value; $(out).textContent = fmt(set[id]); });
-$('still').onchange = e => set.still = e.target.checked;
-$('sound').onchange = e => set.sound = e.target.checked;
-let pausedMode = null;
+$('still').onchange = e => set.still = e.target.checked; $('sound').onchange = e => set.sound = e.target.checked;
+let paused = null;
 $('btnTune').onclick = () => {
-  const open = $('tune').classList.contains('hidden');
-  $('tune').classList.toggle('hidden', !open);
-  if (open && s.mode === 'play') { pausedMode = 'play'; s.mode = 'idle'; }
-  else if (!open && pausedMode) { s.mode = pausedMode; pausedMode = null; }
+  const open = $('tune').classList.contains('hidden'); $('tune').classList.toggle('hidden', !open);
+  if (open && s.mode === 'play') { paused = 'play'; s.mode = 'idle'; } else if (!open && paused) { s.mode = paused; paused = null; }
 };
-$('btnTuneClose').onclick = () => { $('tune').classList.add('hidden'); if (pausedMode) { s.mode = pausedMode; pausedMode = null; } };
+$('btnTuneClose').onclick = () => { $('tune').classList.add('hidden'); if (paused) { s.mode = paused; paused = null; } };
 $('btnTuneReset').onclick = () => { Object.assign(set, DEFAULTS); syncSliders(); };
 if (matchMedia('(prefers-reduced-motion: reduce)').matches) set.still = true;
 syncSliders();
 
-// test hook for QA
-window.__tilt = { s, set, holes, walls, goal, pad };
+window.__lvl = { s, set, doors, bridge, switches, arm, holes, sun, pit };
 </script>
 </body>
 </html>
